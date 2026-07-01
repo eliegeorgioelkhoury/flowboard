@@ -1,0 +1,33 @@
+# ---- Environment ----
+.env
+.env.*
+!.env.example
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- Vercel ----
+.vercel
+
+# ---- Supabase (local CLI) ----
+supabase/.branches
+supabase/.temp
+
+# ---- IDE / Editor ----
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
