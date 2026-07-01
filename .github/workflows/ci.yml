@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least privilege. The scaffold job stays green until code lands, then activates automatically.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect app
+        id: detect
+        run: |
+          if [ -f package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Set up Node
+        if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install
+        if: steps.detect.outputs.present == 'true'
+        run: npm ci
+      - name: Lint
+        if: steps.detect.outputs.present == 'true'
+        run: npm run lint
+      - name: Test
+        if: steps.detect.outputs.present == 'true'
+        run: npm test
+      - name: Build
+        if: steps.detect.outputs.present == 'true'
+        run: npm run build
+      - name: Awaiting app scaffold
+        if: steps.detect.outputs.present == 'false'
+        run: echo "package.json not present yet — GATE 1 scaffold. Milestone 2 activates this job."
