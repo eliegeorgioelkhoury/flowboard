@@ -174,7 +174,7 @@ export function BoardView({ initial, live }: { initial: BoardData; live: boolean
   };
 
   return (
-    <div className={styles.app} onPointerMove={onPointerMove}>
+    <div className={styles.app} data-live={live ? 'true' : 'false'} onPointerMove={onPointerMove}>
       <header className={styles.topbar}>
         <div className={styles.brand}>
           <span className={styles.logo} aria-hidden="true">

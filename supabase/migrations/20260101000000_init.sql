@@ -92,6 +92,18 @@ create policy "labels access" on public.card_labels for all
   using (exists (select 1 from public.cards c where c.id = card_id and public.can_access_board(c.board_id)))
   with check (exists (select 1 from public.cards c where c.id = card_id and public.can_access_board(c.board_id)));
 
+-- ---------- Data API grants ----------
+-- Supabase's current default does NOT auto-expose new public entities to the Data API
+-- roles (see `auto_expose_new_tables` in config.toml), so grant access explicitly.
+-- RLS (above) still decides which *rows* each role may read or write; these grants only
+-- open the tables + policy helper to PostgREST at all. Without them, every anon-key call
+-- is permission-denied and the app silently falls back to static seed data.
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete
+  on public.boards, public.columns, public.cards, public.card_labels
+  to anon, authenticated, service_role;
+grant execute on function public.can_access_board(uuid) to anon, authenticated, service_role;
+
 -- ---------- Realtime (postgres_changes) ----------
 alter table public.columns replica identity full;
 alter table public.cards replica identity full;
