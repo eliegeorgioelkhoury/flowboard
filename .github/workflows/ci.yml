@@ -6,38 +6,54 @@ on:
   pull_request:
     branches: [main]
 
-# Least privilege. The scaffold job stays green until code lands, then activates automatically.
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build, lint & test
+  quality:
+    name: Typecheck · Lint · Unit · Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Detect app
-        id: detect
-        run: |
-          if [ -f package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
-      - name: Set up Node
-        if: steps.detect.outputs.present == 'true'
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
-      - name: Install
-        if: steps.detect.outputs.present == 'true'
-        run: npm ci
-      - name: Lint
-        if: steps.detect.outputs.present == 'true'
-        run: npm run lint
-      - name: Test
-        if: steps.detect.outputs.present == 'true'
-        run: npm test
-      - name: Build
-        if: steps.detect.outputs.present == 'true'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: E2E (Playwright + real Supabase)
+    runs-on: ubuntu-latest
+    needs: [quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start Supabase (applies migrations + seed)
+        run: supabase start
+      - name: Export local Supabase env
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Build (with Supabase env)
         run: npm run build
-      - name: Awaiting app scaffold
-        if: steps.detect.outputs.present == 'false'
-        run: echo "package.json not present yet — GATE 1 scaffold. Milestone 2 activates this job."
+      - name: Run E2E (drag-and-drop against real Supabase)
+        run: npm run e2e
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop || true
