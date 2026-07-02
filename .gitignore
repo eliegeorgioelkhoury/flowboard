@@ -11,13 +11,17 @@ build/
 dist/
 coverage/
 *.tsbuildinfo
-next-env.d.ts
 npm-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
 # ---- Vercel ----
 .vercel
+
+# ---- Playwright ----
+/test-results
+/playwright-report
+/playwright/.cache
 
 # ---- Supabase (local CLI) ----
 supabase/.branches
