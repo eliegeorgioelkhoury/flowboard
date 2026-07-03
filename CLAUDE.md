@@ -28,7 +28,7 @@ Flowboard is a realtime multiplayer Kanban board. The signature experience: spri
 
 ## Conventions
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `ci:`, `test:`, `refactor:`).
-- **Secrets:** never commit real secrets. `.env.example` is the template; `NEXT_PUBLIC_*` values are browser-safe, `SUPABASE_SERVICE_ROLE_KEY` is server-only. Real values live in host dashboards and GitHub Actions secrets.
+- **Secrets:** never commit real secrets. `.env.example` is the template; the app needs only the two `NEXT_PUBLIC_*` Supabase values (browser-safe) — every read goes through the anon/publishable key + RLS, so there is no service-role key. Real values live in host dashboards (Vercel) and GitHub Actions secrets.
 - **Realtime:** optimistic UI updates must reconcile against the server's confirmed row state.
 - **RLS:** users are scoped to their own boards; keep exactly one public demo board readable without signup.
 - **Accessibility & motion:** responsive to mobile, visible keyboard focus, honor `prefers-reduced-motion`.

@@ -1,13 +1,14 @@
 # Flowboard — STATE
 
-**Status:** in progress — milestones 1–6 built and tested; **paused before deploy** (milestone 7)
-**Next:** milestone 7 — Deploy (awaiting the user's own Supabase + Vercel accounts and secrets)
+**Status:** milestones 1–6 built & CI-green; **milestone 7 deploy config prepared** (config only — nothing deployed yet)
+**Next:** run the deploy — create the Supabase + Vercel projects, set the env vars / cron secrets, push the schema (manual dashboard steps; awaiting the owner's accounts)
 
 _Living doc. Update after each milestone: what shipped, what's in flight, what's blocked._
 
 ## Now
 - Local: `npm run dev` renders the board from a **static-seed fallback** (no Supabase needed for a visual preview). Realtime + persistence require Supabase.
 - CI is green on real tests: Vitest units + a Playwright drag-and-drop E2E run against a **real Supabase** (`supabase start` on the runner — Postgres + RLS + realtime), no cloud project required.
+- **Deploy config is in place** (config only, nothing deployed): `vercel.json` (zero-config Next.js), a twice-weekly `keep-warm` cron ([`.github/workflows/keep-warm.yml`](.github/workflows/keep-warm.yml)), and the exact Vercel env vars + cron secrets documented in the [README](README.md#deploy-vercel--supabase). The app reads only the two `NEXT_PUBLIC_` Supabase values — no service-role key.
 
 ## Done
 - **GATE 1** — repository hygiene, CI, living docs.
@@ -19,10 +20,10 @@ _Living doc. Update after each milestone: what shipped, what's in flight, what's
 - **M6** — **Vitest** units (ordering, board reducer, presence) + a **Playwright** drag-and-drop E2E that moves a card across columns and reloads to prove persistence. CI green on real tests.
 
 ## Next
-- **Milestone 7 — Deploy.** Vercel (Next.js) + a Supabase project; weekly cron ping to keep the free tier warm; public demo-board link; README GIF + screenshots; homepage; pin.
+- **Milestone 7 — Deploy (execute).** Create the Supabase project + apply `migrations`/`seed`; create the Vercel project + set the two `NEXT_PUBLIC_` env vars; add the two `keep-warm` repo secrets. Then: public demo-board link, README GIF + screenshots, homepage, pin.
 
 ## Blocked
-- Deploy is intentionally **paused for review** (GATE 3 stop). It needs the user's own Supabase + Vercel accounts and secrets (no real secrets are committed).
+- The deploy itself is a **manual dashboard step** awaiting the owner's Supabase + Vercel accounts and secrets. All config is committed; no real secrets are.
 
 ## Design + a11y
 - Tokens: **Canvas / Ink** surfaces + per-user accents **Violet / Cyan / Rose / Amber**; **Satoshi** (display) + **Inter** (body). Visible keyboard focus, contrast-checked colours, consistent spacing.

@@ -1,0 +1,40 @@
+name: Keep Supabase warm
+
+# Supabase free-tier projects auto-pause after ~7 days without activity. A single
+# weekly ping would risk pausing whenever GitHub delays a scheduled run, so this
+# pings twice a week (Mon + Thu) to stay comfortably under the threshold. Drop to
+# one day, or delete this workflow, once the project is on a paid tier.
+on:
+  schedule:
+    - cron: '0 7 * * 1,4' # 07:00 UTC, Monday & Thursday
+  workflow_dispatch: {} # allow a manual ping from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Ping Supabase REST
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lightweight query against the public demo board
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_ANON_KEY:-}" ]; then
+            echo "::error::Set the SUPABASE_URL and SUPABASE_ANON_KEY repository secrets."
+            exit 1
+          fi
+          # One-row, anon-key read of the public demo board — enough activity to keep
+          # the project awake, no writes, no service-role key.
+          status=$(curl -sS --max-time 30 --retry 3 --retry-delay 5 --retry-connrefused \
+            -o /dev/null -w '%{http_code}' \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/boards?select=id&is_demo=eq.true&limit=1") || true
+          echo "Supabase REST responded HTTP ${status}"
+          case "${status}" in
+            2*) echo "Project is awake ✅" ;;
+            *) echo "::error::Unexpected status ${status} — project may be paused or the secrets are wrong."; exit 1 ;;
+          esac
