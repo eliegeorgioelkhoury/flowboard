@@ -55,6 +55,10 @@ export function BoardView({ initial, live }: { initial: BoardData; live: boolean
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const boardAreaRef = useRef<HTMLDivElement>(null);
+  // Where the active card sat when the drag began. onDragOver moves it optimistically
+  // mid-drag, so onDragEnd must compare against this origin (not the mutated state) to
+  // know whether to persist.
+  const dragOriginRef = useRef<{ columnId: string; position: number } | null>(null);
   const [size, setSize] = useState({ width: 1, height: 1 });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -80,7 +84,10 @@ export function BoardView({ initial, live }: { initial: BoardData; live: boolean
   }, []);
 
   const onDragStart = (e: DragStartEvent) => {
-    setActiveId(String(e.active.id));
+    const id = String(e.active.id);
+    setActiveId(id);
+    const card = state.cards.find((c) => c.id === id);
+    dragOriginRef.current = card ? { columnId: card.column_id, position: card.position } : null;
     sendDragging(true);
   };
 
@@ -100,32 +107,32 @@ export function BoardView({ initial, live }: { initial: BoardData; live: boolean
   const onDragEnd = (e: DragEndEvent) => {
     setActiveId(null);
     sendDragging(false);
+    const origin = dragOriginRef.current;
+    dragOriginRef.current = null;
+
     const { active, over } = e;
-    if (!over) return;
     const cardId = String(active.id);
     const card = state.cards.find((c) => c.id === cardId);
     if (!card) return;
-    const overId = String(over.id);
 
-    let toCol: string;
-    let index: number;
-    if (columnIds.has(overId)) {
-      toCol = overId;
-      index = cardsByColumn(state, toCol).filter((c) => c.id !== cardId).length;
-    } else {
-      const overCard = state.cards.find((c) => c.id === overId);
-      if (!overCard) return;
-      toCol = overCard.column_id;
-      const list = cardsByColumn(state, toCol).filter((c) => c.id !== cardId);
-      const idx = list.findIndex((c) => c.id === overId);
-      index = idx < 0 ? list.length : idx;
-    }
+    // Resolve the destination. onDragOver keeps the card's column live during the drag,
+    // so if there's no explicit drop target we finalize wherever it currently rests.
+    const overId = over ? String(over.id) : null;
+    const overCard = overId ? state.cards.find((c) => c.id === overId) : null;
+    const toCol = overId && columnIds.has(overId) ? overId : (overCard?.column_id ?? card.column_id);
+
     const list = cardsByColumn(state, toCol).filter((c) => c.id !== cardId);
+    const overIdx = overCard ? list.findIndex((c) => c.id === overId) : -1;
+    const index = overIdx < 0 ? list.length : overIdx;
     const position = positionForIndex(list, index);
-    if (card.column_id === toCol && card.position === position) return;
 
     dispatch({ type: 'moveCard', cardId, toColumnId: toCol, position });
-    persist(supabase?.from('cards').update({ column_id: toCol, position }).eq('id', cardId));
+
+    // Persist iff the card actually moved from where THIS drag began. Comparing against
+    // current state would miss the move — onDragOver has already applied it optimistically.
+    if (!origin || origin.columnId !== toCol || origin.position !== position) {
+      persist(supabase?.from('cards').update({ column_id: toCol, position }).eq('id', cardId));
+    }
   };
 
   const onPointerMove = (e: PointerEvent) => {
