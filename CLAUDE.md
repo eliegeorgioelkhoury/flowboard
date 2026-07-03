@@ -10,14 +10,21 @@ Flowboard is a realtime multiplayer Kanban board. The signature experience: spri
 - **Backend:** Supabase — Postgres, Realtime channels, Auth, Row-Level Security.
 - **Tests:** Vitest (units), Playwright (drag-and-drop).
 
-## Layout (target)
-- `app/` — Next.js App Router routes (milestone 2)
-- `components/` — board, cards, presence cursors
-- `lib/` — Supabase client, realtime subscriptions, state
-- `supabase/` — SQL migrations + RLS policies (milestone 1)
+## Layout
+- `app/` — Next.js App Router: `page.tsx` (server load, `force-dynamic`), `layout.tsx`, `globals.css` (design tokens)
+- `components/board/` — `BoardView` (orchestrator), `Column`, `CardItem`, `CardDetailPanel`, `PresenceLayer`, and the `useRealtime` / `usePresence` hooks
+- `lib/` — Supabase client/server, `board.ts` (server load + static fallback), `board-reducer.ts`, `ordering.ts`, `presence.ts`, `types.ts`, `demo-data.ts`
+- `supabase/` — SQL migrations, RLS policies, seed
+- `tests/` — Vitest units · `e2e/` — Playwright drag-and-drop
 - `docs/` — demo GIF, screenshots
 
-> As of GATE 1, only repo hygiene, CI, and docs exist. App code arrives from milestone 1 onward.
+> Milestones 1–6 are built and CI-green. Deploy (milestone 7) is intentionally paused for review.
+
+## Key design decisions
+- **Static-seed fallback:** when Supabase env is absent, `lib/board.ts` serves `DEMO_BOARD` so the UI previews without a backend. `live:false` disables realtime + persistence.
+- **Optimistic + realtime:** the UI mutates a pure reducer (`board-reducer.ts`) immediately, then reconciles against `postgres_changes` upserts. Ordering uses fractional `position` floats (`ordering.ts`) so a reorder only writes the moved card.
+- **dnd-kit + Framer:** drag uses a `DragOverlay` (source card dims), and siblings spring via `layout="position"` — this avoids the transform conflict between dnd-kit and Framer layout animations.
+- **Motion a11y:** `prefers-reduced-motion` disables both the card springs and the presence-cursor springs (see `globals.css` + `CardItem` / `PresenceLayer`).
 
 ## Conventions
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `ci:`, `test:`, `refactor:`).
