@@ -15,10 +15,10 @@ No signup — drag cards, open a card's details, and open the link in a second t
 [![Flowboard — click to open the live demo](https://placehold.co/1200x600/7c5cfc/f8fafc?text=Flowboard+%E2%80%94+click+for+the+live+demo)](https://flowboard-five-ochre.vercel.app)
 
 ## Screenshots
-<!-- TODO: drop real captures at docs/board.png, docs/cursors.png, docs/card.png, docs/demo.png and swap the four placeholders below. Until then they link to the live app. -->
+<!-- Board + card-details are real captures. TODO: swap the remaining two — a live-cursors shot (docs/cursors.png) and a public-demo-board shot (docs/demo.png); they link to the live app meanwhile. -->
 | Board | Live cursors | Card details | Public demo board |
 |---|---|---|---|
-| [![Board](https://placehold.co/300x200/7c5cfc/f8fafc?text=Board)](https://flowboard-five-ochre.vercel.app) | [![Cursors](https://placehold.co/300x200/0ea4bd/f8fafc?text=Live+cursors)](https://flowboard-five-ochre.vercel.app) | [![Card](https://placehold.co/300x200/f2477f/f8fafc?text=Card+details)](https://flowboard-five-ochre.vercel.app) | [![Demo](https://placehold.co/300x200/e0912a/f8fafc?text=Demo+board)](https://flowboard-five-ochre.vercel.app) |
+| [![Board](docs/board.png)](https://flowboard-five-ochre.vercel.app) | [![Cursors](https://placehold.co/300x200/0ea4bd/f8fafc?text=Live+cursors)](https://flowboard-five-ochre.vercel.app) | [![Card details](docs/card.png)](https://flowboard-five-ochre.vercel.app) | [![Demo](https://placehold.co/300x200/e0912a/f8fafc?text=Demo+board)](https://flowboard-five-ochre.vercel.app) |
 
 ## Features
 - Drag & drop cards between columns with **dnd-kit** + **Framer Motion** spring physics.
