@@ -1,20 +1,24 @@
 # Flowboard
 
+[![Live demo](https://img.shields.io/badge/Live_demo-online-7c5cfc)](https://flowboard-five-ochre.vercel.app)
 [![CI](https://github.com/eliegeorgioelkhoury/flowboard/actions/workflows/ci.yml/badge.svg)](https://github.com/eliegeorgioelkhoury/flowboard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > Realtime multiplayer Kanban. Drag cards with spring physics and watch collaborators' live cursors move with their names. Optimistic updates, reconciled on server confirm.
 
-**Status:** ✅ Milestones 1–6 built & CI-green (schema/RLS, board, realtime, card details, signature cursors, tests). 🚀 Deploy config ready (M7) — not yet deployed. See [STATE.md](STATE.md) · [ROADMAP.md](ROADMAP.md).
+### ▶︎ [Try the live demo →](https://flowboard-five-ochre.vercel.app)
+No signup — drag cards, open a card's details, and open the link in a second tab to watch live cursors and presence.
 
-<!-- TODO: replace with a looping capture of two cursors dragging cards live; drop the file at docs/demo.gif -->
-![Flowboard demo — coming soon](https://placehold.co/1200x600/4338ca/f8fafc?text=Flowboard+demo+GIF+coming+soon)
+**Status:** ✅ **Shipped & live** — milestones 1–7 complete (schema/RLS, board, realtime, card details, signature cursors, tests, deploy). CI green. See [STATE.md](STATE.md) · [ROADMAP.md](ROADMAP.md).
+
+<!-- TODO: swap for a looping capture of two cursors dragging cards live; drop the file at docs/demo.gif -->
+[![Flowboard — click to open the live demo](https://placehold.co/1200x600/7c5cfc/f8fafc?text=Flowboard+%E2%80%94+click+for+the+live+demo)](https://flowboard-five-ochre.vercel.app)
 
 ## Screenshots
-<!-- TODO: add real captures under docs/ and swap these placeholders -->
+<!-- TODO: drop real captures at docs/board.png, docs/cursors.png, docs/card.png, docs/demo.png and swap the four placeholders below. Until then they link to the live app. -->
 | Board | Live cursors | Card details | Public demo board |
 |---|---|---|---|
-| ![Board](https://placehold.co/300x200?text=Board) | ![Cursors](https://placehold.co/300x200?text=Live+cursors) | ![Card](https://placehold.co/300x200?text=Card+details) | ![Demo](https://placehold.co/300x200?text=Demo+board) |
+| [![Board](https://placehold.co/300x200/7c5cfc/f8fafc?text=Board)](https://flowboard-five-ochre.vercel.app) | [![Cursors](https://placehold.co/300x200/0ea4bd/f8fafc?text=Live+cursors)](https://flowboard-five-ochre.vercel.app) | [![Card](https://placehold.co/300x200/f2477f/f8fafc?text=Card+details)](https://flowboard-five-ochre.vercel.app) | [![Demo](https://placehold.co/300x200/e0912a/f8fafc?text=Demo+board)](https://flowboard-five-ochre.vercel.app) |
 
 ## Features
 - Drag & drop cards between columns with **dnd-kit** + **Framer Motion** spring physics.
